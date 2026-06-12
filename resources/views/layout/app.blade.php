@@ -81,6 +81,10 @@
     <!-- jsvectormap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css"
         integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4=" crossorigin="anonymous" />
+
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/tabulator-tables@6.4.0/dist/css/tabulator_bootstrap5.min.css">
+
 </head>
 <!--end::Head-->
 <!--begin::Body-->
@@ -92,6 +96,59 @@
 
         @include('layout.navbar')
         @include('layout.sidebar')
+
+        <!-- Start Toast notification -->
+        @if (session('success'))
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div id="successToast" class="toast toast-success" role="alert" aria-live="assertive"
+                    aria-atomic="true">
+                    <div class="toast-header">
+                        <i class="bi bi-circle me-2"></i>
+                        <strong class="me-auto">Success</strong>
+                        <small id="toastTimer">11 mins ago</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">{{ session('success') }}</div>
+                </div>
+            </div>
+
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+
+                    const toastElement = document.getElementById('successToast');
+
+                    if (toastElement) {
+
+                        const delay = 3000;
+                        const toast = new bootstrap.Toast(toastElement, {
+                            delay: delay
+                        });
+
+                        const timerElement = document.getElementById('toastTimer');
+
+                        let remaining = delay / 1000;
+
+                        timerElement.textContent = `${remaining} detik`;
+
+                        const countdown = setInterval(() => {
+                            remaining--;
+
+                            if (remaining > 0) {
+                                timerElement.textContent = `${remaining} detik`;
+                            } else {
+                                clearInterval(countdown);
+                                timerElement.textContent = '';
+                            }
+                        }, 1000);
+
+                        toast.show();
+                    }
+                });
+            </script>
+        @endif
+        <!-- End Toast notification -->
+
 
         <!--begin::App Main-->
         <main class="app-main">
@@ -115,6 +172,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
     <script src="/adminlte/dist/js/adminlte.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/tabulator-tables@6.4.0/dist/js/tabulator.min.js"></script>
+
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
     <script>
         const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';

@@ -46,10 +46,50 @@ class LoginController extends Controller
     }
 
     public function dashboard()
-    {
-        if(!session()->has('sql_server')){
-            return redirect()->route('login');
-        }
-        return view('dashboard');
+{
+    if (!session()->has('sql_server')) {
+        return redirect()->route('login');
     }
+
+    try {
+
+        $dsn = "sqlsrv:server=" . session('sql_server') . ";Database=master";
+
+        $connect = new PDO(
+            $dsn,
+            session('sql_username'),
+            session('sql_password')
+        );
+
+        $connect->setAttribute(
+            PDO::ATTR_ERRMODE,
+            PDO::ERRMODE_EXCEPTION
+        );
+
+        $sql = "
+            SELECT name
+            FROM sys.databases
+            WHERE name NOT IN ('tempdb')
+            ORDER BY name
+        ";
+
+        $stmt = $connect->query($sql);
+
+        $databases = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return view('dashboard', compact('databases'));
+
+    } catch (Exception $e) {
+
+        session()->forget([
+            'sql_server',
+            'sql_username',
+            'sql_password',
+        ]);
+
+        return redirect()
+            ->route('login')
+            ->with('error', $e->getMessage());
+    }
+}
 }
